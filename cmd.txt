@@ -32,4 +32,4 @@ git config --global user.name linyukong
 git config --global user.email kly20@mails.tsinghua.edu.cn
 git clone https://github.com/linyukong/vasp_relax.git
 cd vasp_relax
-python relax.py --path ./B --interleave 0 50 --gamma --wandb
+python relax.py --path ./B --interleave 0 50 --gamma --wandb --n_core 8

@@ -10,7 +10,7 @@ import wandb
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--path",type=str,default=None)  ## path and path/data must exist
-parser.add_argument("--n_core",type=int,default=16)
+parser.add_argument("--n_core",type=int,default=8)
 parser.add_argument("--relax_steps",type=int,default=1000)
 parser.add_argument("--shake_steps",type=int,default=0)     
 parser.add_argument("--sample_freq",type=int,default=1)
@@ -22,7 +22,7 @@ parser.add_argument("--ediff",type=float,default=1e-4)
 parser.add_argument("--ismear",type=int,default=0)
 parser.add_argument("--sigma",type=float,default=0.02)
 parser.add_argument("--amplitude",type=float,default=0.2)
-parser.add_argument("--kspacing",type=float,default=0.02)
+parser.add_argument("--kspacing",type=float,default=0.07)
 parser.add_argument("--gamma",action="store_true")
 parser.add_argument("--nelm",type=int,default=200)
 parser.add_argument("--wandb",action="store_true")
