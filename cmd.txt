@@ -1,0 +1,29 @@
+sudo apt update
+sudo apt install unzip
+sudo apt install wget
+make --version
+gcc --version
+sudo lsb_release -a
+wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh --no-check-certificate
+yes yes|bash miniconda.sh -b -p ~/anaconda
+rm -rf miniconda.sh
+~/anaconda/bin/conda clean -ay
+. ~/anaconda/etc/profile.d/conda.sh
+conda activate base
+conda create -n vasp python=3.8 -y
+conda activate vasp
+conda install -c conda-forge rsync -y
+yes yes|sudo DEBIAN_FRONTEND=noninteractive apt install make build-essential g++ gfortran libopenblas-dev libopenmpi-dev libscalapack-openmpi-dev libfftw3-dev libhdf5-openmpi-dev
+yes yes|wget --quiet https://cloud.tsinghua.edu.cn/f/3ea4297fa7cb43ec9bf9/?dl=1 -O vasp.zip --no-check-certificate
+yes yes|unzip vasp.zip -d ~/vasp
+cd ~/vasp
+cp makefile.include ./vasp.6.3.0
+cd vasp.6.3.0
+make DEPS=1 -j
+cp ./bin/vasp_gam ~/anaconda/envs/vasp/bin/
+cp ./bin/vasp_ncl ~/anaconda/envs/vasp/bin/
+cp ./bin/vasp_std ~/anaconda/envs/vasp/bin/
+mkdir ~/vasp_run
+cd ~/vasp_run
+
+python relax.py --path ./B --interleave 0 2 --gamma --wandb
