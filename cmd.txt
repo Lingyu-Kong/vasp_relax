@@ -20,10 +20,16 @@ cd ~/vasp
 cp makefile.include ./vasp.6.3.0
 cd vasp.6.3.0
 make DEPS=1 -j
+export OMP_NUM_THREADS=1
 cp ./bin/vasp_gam ~/anaconda/envs/vasp/bin/
 cp ./bin/vasp_ncl ~/anaconda/envs/vasp/bin/
 cp ./bin/vasp_std ~/anaconda/envs/vasp/bin/
-mkdir ~/vasp_run
-cd ~/vasp_run
-
-python relax.py --path ./B --interleave 0 2 --gamma --wandb
+cd ~
+conda install -c conda-forge ase -y
+conda install -c conda-forge wandb -y
+conda install -c anaconda git -y
+git config --global user.name linyukong
+git config --global user.email kly20@mails.tsinghua.edu.cn
+git clone https://github.com/linyukong/vasp_relax.git
+cd vasp_relax
+python relax.py --path ./B --interleave 0 50 --gamma --wandb --n_core 8
