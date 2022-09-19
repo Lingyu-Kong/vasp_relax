@@ -1,4 +1,3 @@
-from hashlib import shake_128
 import ase
 from ase.io import read, write,Trajectory
 from ase.calculators.vasp import Vasp
@@ -23,7 +22,7 @@ parser.add_argument("--ediff",type=float,default=1e-4)
 parser.add_argument("--ismear",type=int,default=0)
 parser.add_argument("--sigma",type=float,default=0.02)
 parser.add_argument("--amplitude",type=float,default=0.2)
-parser.add_argument("--kspacing",type=float,default=0.07)
+parser.add_argument("--kspacing",type=float,default=0.02)
 parser.add_argument("--gamma",action="store_true")
 parser.add_argument("--nelm",type=int,default=200)
 parser.add_argument("--wandb",action="store_true")
@@ -56,6 +55,7 @@ relax_path=os.path.join(args.path,"relax")
 shake_path=os.path.join(args.path,"shake")
 input_files=os.listdir(input_path)
 input_files.sort()
+print(len(input_files))
 input_files=input_files[args.interleave[0]:args.interleave[1]]
 
 
