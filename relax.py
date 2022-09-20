@@ -91,8 +91,6 @@ if __name__=="__main__":
                 end_time=time.time()
                 ## relax ends
                 print("relax finished for {} in {} seconds".format(file,end_time-start_time))
-                if args.wandb:
-                    wandb.log({"relaxed energy":atoms.get_potential_energy()})
             except:
                 print("relax failed for {}".format(file))
             ## clean up the vasp_run directory
