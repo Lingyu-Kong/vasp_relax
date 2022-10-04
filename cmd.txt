@@ -28,6 +28,8 @@ cd ~
 conda install -c conda-forge ase -y
 conda install -c conda-forge wandb -y
 conda install -c anaconda git -y
+conda install pip -y
+pip install zipfile38
 git config --global user.name linyukong
 git config --global user.email kly20@mails.tsinghua.edu.cn
 git clone https://github.com/linyukong/vasp_relax.git

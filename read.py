@@ -1,6 +1,6 @@
 from ase.io.trajectory import Trajectory
 
-traj = Trajectory('./B/relax/traj_seed_0.traj')
+traj = Trajectory('./B8_minimal_shake/traj_seed_0.traj')
 print(len(traj))
 atoms = traj[-1]
 print(atoms.get_potential_energy())
