@@ -10,7 +10,7 @@ import zipfile38 as zipfile
 parser=argparse.ArgumentParser()
 parser.add_argument("--path",type=str,default=None)
 parser.add_argument("--n_core",type=int,default=6)
-parser.add_argument("--amplitude",type=float,default=0.2)
+parser.add_argument("--amplitude",type=float,default=0.02)
 parser.add_argument("--shake_steps",type=int,default=20)  
 parser.add_argument("--kspacing",type=float,default=0.2)
 parser.add_argument("--interleave",nargs="+",type=int,default=[0,2])
@@ -64,13 +64,15 @@ def zipDir(dirpath, outFullName):
 
 if __name__=="__main__":
     for file in files:
-        atoms=read(os.path.join(args.path,file))
         traj_writer=TrajectoryWriter(os.path.join(outpath,file.replace(".res",".traj")),mode="a",properties=["energy","forces","stress"])
+        atoms=read(os.path.join(args.path,file))
+        atoms.set_calculator(calc)
         traj_writer.write(atoms)
         for i in range(args.shake_steps):
             atoms.rattle(stdev=args.amplitude)
             atoms.set_calculator(calc)
             traj_writer.write(atoms)
+            print("step: ",i," energy: ",atoms.get_potential_energy())
         os.system("rm -r "+os.path.join(args.path,"vasp_run"))
         traj_writer.close()
     zipDir(outpath,"shake_"+args.path+".zip")
