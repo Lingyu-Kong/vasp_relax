@@ -25,7 +25,7 @@ os.environ["VASP_PP_PATH"]=os.path.join(os.getcwd(),"VASP_PP")
 
 if args.wandb:
     wandb.login(key="37f3de06380e350727df28b49712f8b7fe5b14aa")
-    wandb.init(project="vasp run",name="shake "+args.path,config=args)
+    wandb.init(project="vasp run",name="shake "+args.path+str(args.interleave),config=args)
 
 assert(args.path is not None)
 
