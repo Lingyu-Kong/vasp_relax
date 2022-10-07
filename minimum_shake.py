@@ -69,6 +69,7 @@ if __name__=="__main__":
         atoms.set_calculator(calc)
         traj_writer.write(atoms)
         for i in range(args.shake_steps):
+            atoms=read(os.path.join(args.path,file))
             atoms.rattle(stdev=args.amplitude)
             atoms.set_calculator(calc)
             traj_writer.write(atoms)
