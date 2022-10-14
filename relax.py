@@ -22,7 +22,7 @@ parser.add_argument("--ediff",type=float,default=1e-4)
 parser.add_argument("--ismear",type=int,default=0)
 parser.add_argument("--sigma",type=float,default=0.02)
 parser.add_argument("--amplitude",type=float,default=0.2)
-parser.add_argument("--kspacing",type=float,default=0.07)
+parser.add_argument("--kspacing",type=float,default=0.2)
 parser.add_argument("--gamma",action="store_true")
 parser.add_argument("--nelm",type=int,default=200)
 parser.add_argument("--wandb",action="store_true")
@@ -32,7 +32,6 @@ ASE_VASP_COMMAND="mpirun -np "+str(args.n_core)+" vasp_std"
 
 assert(args.path is not None)
 assert(os.path.exists(args.path))
-assert(os.path.exists(os.path.join(args.path,"data")))
 assert(args.relax_steps>0)
 assert(args.shake_steps>=0)
 assert(os.path.exists(os.getcwd()+"/VASP_PP"))  ## VASP_PP must be under the working directory
@@ -50,7 +49,8 @@ if not os.path.exists(os.path.join(args.path,"relax")):
 if not os.path.exists(os.path.join(args.path,"vasp_run")):
     os.mkdir(os.path.join(args.path,"vasp_run"))
     
-input_path=os.path.join(args.path,"data")
+# input_path=os.path.join(args.path,"data")
+input_path=os.path.join(args.path)
 relax_path=os.path.join(args.path,"relax")
 shake_path=os.path.join(args.path,"shake")
 input_files=os.listdir(input_path)
@@ -75,6 +75,7 @@ calc = Vasp(xc='PBE',
 if __name__=="__main__":
     os.system("rm -rf "+args.path+"/vasp_run/*")
     os.system("rm -rf "+args.path+"/relax/*")
+    time_list=[]
     for file in input_files:
         if file.endswith(".res"):
             try:
@@ -91,6 +92,7 @@ if __name__=="__main__":
                 end_time=time.time()
                 ## relax ends
                 print("relax finished for {} in {} seconds".format(file,end_time-start_time))
+                time_list.append(end_time-start_time)
                 if args.wandb:
                     wandb.log({"relaxed energy":atoms.get_potential_energy()})
             except:
@@ -99,6 +101,7 @@ if __name__=="__main__":
             os.system("rm -rf "+args.path+"/vasp_run/*")
     if args.wandb:
         wandb.save(args.path+"/relax/*")
+    print("average time: {}".format(sum(time_list)/len(time_list)))
         
 
 
