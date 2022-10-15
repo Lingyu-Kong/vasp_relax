@@ -7,6 +7,7 @@ import argparse
 import os
 import time
 import wandb
+from utils import zipDir
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--path",type=str,default=None)  ## path and path/data must exist
@@ -54,8 +55,8 @@ input_path=os.path.join(args.path)
 relax_path=os.path.join(args.path,"relax")
 shake_path=os.path.join(args.path,"shake")
 input_files=os.listdir(input_path)
+input_files=[f for f in input_files if f.endswith(".res")]
 input_files.sort()
-print(len(input_files))
 input_files=input_files[args.interleave[0]:args.interleave[1]]
 
 
@@ -76,31 +77,32 @@ if __name__=="__main__":
     os.system("rm -rf "+args.path+"/vasp_run/*")
     os.system("rm -rf "+args.path+"/relax/*")
     time_list=[]
+    print(len(input_files))
     for file in input_files:
-        if file.endswith(".res"):
-            try:
-                start_time=time.time()
-                ## relax begins:
-                atoms=read(os.path.join(input_path,file))
-                atoms.set_calculator(calc)
-                ecf=ExpCellFilter(atoms)
-                traj = Trajectory(relax_path+"/traj_"+file.replace(".res",".traj"), 'w', atoms, properties=["energy","forces","stress"])
-                optimizer = PreconLBFGS(ecf, precon=Exp(3), use_armijo=True, master=True)
-                optimizer.attach(traj.write, interval=args.sample_freq)
-                optimizer.run(fmax=args.fmax, smax=args.smax, steps=args.relax_steps)
-                traj.close()
-                end_time=time.time()
-                ## relax ends
-                print("relax finished for {} in {} seconds".format(file,end_time-start_time))
-                time_list.append(end_time-start_time)
-                if args.wandb:
-                    wandb.log({"relaxed energy":atoms.get_potential_energy()})
-            except:
-                print("relax failed for {}".format(file))
-            ## clean up the vasp_run directory
-            os.system("rm -rf "+args.path+"/vasp_run/*")
+        try:
+            start_time=time.time()
+            ## relax begins:
+            atoms=read(os.path.join(input_path,file))
+            atoms.set_calculator(calc)
+            ecf=ExpCellFilter(atoms)
+            traj = Trajectory(relax_path+"/traj_"+file.replace(".res",".traj"), 'w', atoms, properties=["energy","forces","stress"])
+            optimizer = PreconLBFGS(ecf, precon=Exp(3), use_armijo=True, master=True)
+            optimizer.attach(traj.write, interval=args.sample_freq)
+            optimizer.run(fmax=args.fmax, smax=args.smax, steps=args.relax_steps)
+            traj.close()
+            end_time=time.time()
+            ## relax ends
+            print("relax finished for {} in {} seconds".format(file,end_time-start_time))
+            time_list.append(end_time-start_time)
+            if args.wandb:
+                wandb.log({"relaxed energy":atoms.get_potential_energy()})
+        except:
+            print("relax failed for {}".format(file))
+        ## clean up the vasp_run directory
+        os.system("rm -rf "+args.path+"/vasp_run/*")
     if args.wandb:
-        wandb.save(args.path+"/relax/*")
+        zipDir(args.path+"/relax","relax_"+args.path+".zip")
+        wandb.save("relax_"+args.path+".zip")
     print("average time: {}".format(sum(time_list)/len(time_list)))
         
 
