@@ -7,6 +7,7 @@ import argparse
 import os
 import time
 import wandb
+import numpy as np
 from utils import zipDir
 
 parser=argparse.ArgumentParser()
@@ -77,6 +78,7 @@ if __name__=="__main__":
     os.system("rm -rf "+args.path+"/vasp_run/*")
     os.system("rm -rf "+args.path+"/relax/*")
     time_list=[]
+    step_list=[]
     print(len(input_files))
     for file in input_files:
         start_time=time.time()
@@ -94,18 +96,21 @@ if __name__=="__main__":
             ## relax ends
             print("relax finished for {} in {} seconds".format(file,end_time-start_time))
             time_list.append(end_time-start_time)
+            step_list.append(len(traj))
             if args.wandb:
                 wandb.log({"relaxed energy":atoms.get_potential_energy()})
         except:
             end_time=time.time()
             print("relax failed for {} in {} seconds".format(file,end_time-start_time))
             time_list.append(end_time-start_time)
+            step_list.append(len(traj))
         ## clean up the vasp_run directory
         os.system("rm -rf "+args.path+"/vasp_run/*")
     if args.wandb:
         zipDir(args.path+"/relax","relax_"+args.path+".zip")
         wandb.save("relax_"+args.path+".zip")
-    print("average time: {}".format(sum(time_list)/len(time_list)))
+    print("average time per traj: {}".format(sum(time_list)/len(time_list)))
+    print("average time per step: {}".format(np.sum(time_list)/np.sum(step_list)))
         
 
 
