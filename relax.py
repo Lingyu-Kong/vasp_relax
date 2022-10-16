@@ -79,8 +79,8 @@ if __name__=="__main__":
     time_list=[]
     print(len(input_files))
     for file in input_files:
+        start_time=time.time()
         try:
-            start_time=time.time()
             ## relax begins:
             atoms=read(os.path.join(input_path,file))
             atoms.set_calculator(calc)
@@ -97,7 +97,9 @@ if __name__=="__main__":
             if args.wandb:
                 wandb.log({"relaxed energy":atoms.get_potential_energy()})
         except:
-            print("relax failed for {}".format(file))
+            end_time=time.time()
+            print("relax failed for {} in {} seconds".format(file,end_time-start_time))
+            time_list.append(end_time-start_time)
         ## clean up the vasp_run directory
         os.system("rm -rf "+args.path+"/vasp_run/*")
     if args.wandb:
